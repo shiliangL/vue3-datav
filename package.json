@@ -1,0 +1,27 @@
+{
+    "name": "vue3-datav2",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "vue": "^3.2.45"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^4.0.0",
+        "@yankeeinlondon/code-builder": "^1.2.1",
+        "eslint": "^8.0.1",
+        "eslint-config-standard": "^17.0.0",
+        "eslint-plugin-import": "^2.25.2",
+        "eslint-plugin-n": "^15.0.0",
+        "eslint-plugin-promise": "^6.0.0",
+        "eslint-plugin-vue": "^9.9.0",
+        "vite": "^4.1.0",
+        "vite-plugin-markdown-preview": "^1.0.3",
+        "vite-plugin-vue-markdown": "^0.22.4"
+    }
+}
