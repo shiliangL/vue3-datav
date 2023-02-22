@@ -35,10 +35,10 @@ export const style = {
   'light': {
     name: '亮色菜单风格',
     menu: {
-      textColor: '#272727',
+      textColor: '#000',
       background: '#fff',
       childrenBackground: '#fff',
-      hoverBackground: '#f1f1f1',
+      hoverBackground: '#e6f7ff',
       submenuActiveColor: 'var(--system-primary-color)'
     },
     logo: {

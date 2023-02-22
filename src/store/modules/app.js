@@ -8,7 +8,7 @@ const state = () => ({
   elementSize: 'mini', // element默认尺寸，支持官网四个大小参数
   theme: {
     state: {
-      style: 'default',
+      style: 'light',
       primaryColor: '#409eff',
       menuType: 'side'
     }
