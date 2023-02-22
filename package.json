@@ -18,12 +18,20 @@
     "throttle-debounce": "^3.0.1",
     "vue": "^3.1.2",
     "vue-router": "4",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
+    "vxe-table": "^4.3.10",
+    "xe-utils": "^3.5.7"
   },
   "devDependencies": {
     "@types/node": "^15.0.3",
     "@vitejs/plugin-vue": "^1.2.2",
     "@vue/compiler-sfc": "^3.0.5",
+    "eslint": "^8.0.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-vue": "^9.9.0",
     "sass": "^1.32.12",
     "vite": "2.3.7",
     "vite-plugin-mock": "2.8.0",

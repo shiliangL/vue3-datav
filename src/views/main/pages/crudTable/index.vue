@@ -1,167 +1,201 @@
 <template>
-  <div class="layout-container">
-    <div class="layout-container-form flex space-between">
-      <div class="layout-container-form-handle">
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="handleAdd">新增</el-button>
-        <el-popconfirm title="批量删除" @confirm="handleDel(chooseData)">
-          <template #reference>
-            <el-button type="danger" icon="el-icon-delete" :disabled="chooseData.length === 0">批量删除</el-button>
+  <vxe-grid ref="xGrid" v-bind="gridOptions">
+    <!--将表单放在工具栏中-->
+    <template #toolbar_buttons>
+      <vxe-form :data="formData" @submit="searchEvent" @reset="resetEvent">
+        <vxe-form-item field="name">
+          <template #default>
+            <vxe-input v-model="formData.name" type="text" placeholder="请输入名称"></vxe-input>
           </template>
-        </el-popconfirm>
-      </div>
-      <div class="layout-container-form-search">
-        <el-input v-model="query.input" placeholder="请输入关键词进行检索" @change="getTableData(true)"></el-input>
-        <el-button type="primary" icon="el-icon-search" class="search-btn" @click="getTableData(true)">搜索</el-button>
-      </div>
-    </div>
-    <div class="layout-container-table">
-      <Table
-        ref="table"
-        v-model:page="page"
-        v-loading="loading"
-        :showIndex="true"
-        :showSelection="true"
-        :data="tableData"
-        @getTableData="getTableData"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column prop="name" label="名称" align="center" />
-        <el-table-column prop="number" label="数字" align="center" />
-        <el-table-column prop="chooseName" label="选择器" align="center" />
-        <el-table-column prop="radioName" label="单选框" align="center" />
-        <el-table-column label="操作" align="center" fixed="right" width="200">
-          <template #default="scope">
-            <el-button @click="handleEdit(scope.row)">编辑</el-button>
-            <el-popconfirm title="删除" @confirm="handleDel([scope.row])">
-              <template #reference>
-                <el-button type="danger">删除</el-button>
-              </template>
-            </el-popconfirm>
+        </vxe-form-item>
+        <vxe-form-item>
+          <template #default>
+            <vxe-button type="submit" status="primary" content="查询"></vxe-button>
+            <vxe-button type="reset" content="重置"></vxe-button>
           </template>
-        </el-table-column>
-      </Table>
-      <Layer :layer="layer" @getTableData="getTableData" v-if="layer.show" />
-    </div>
-  </div>
+        </vxe-form-item>
+      </vxe-form>
+    </template>
+    <!--自定义空数据模板-->
+    <template #empty>
+      <span style="color: red;">
+        <p>没有更多数据了！</p>
+      </span>
+    </template>
+  </vxe-grid>
 </template>
 
 <script>
-import { defineComponent, ref, reactive } from 'vue'
-import Table from '@/components/table/index.vue'
-import { getData, del } from '@/api/table'
-import Layer from './layer.vue'
-import { ElMessage } from 'element-plus'
-import { selectData, radioData } from './enum'
+
+// import { useStore } from 'vuex'
+import XEUtils from 'xe-utils'
+// import { VxeGridInstance, VxeGridProps } from 'vxe-table'
+import { defineComponent, reactive, ref } from 'vue'
+
 export default defineComponent({
-  name: 'crudTable',
-  components: {
-    Table,
-    Layer
-  },
-  setup() {
-    // 存储搜索用的数据
-    const query = reactive({
-      input: ''
-    })
-    // 弹窗控制器
-    const layer = reactive({
-      show: false,
-      title: '新增',
-      showButton: true
-    })
-    // 分页参数, 供table使用
-    const page = reactive({
-      index: 1,
-      size: 20,
-      total: 0
-    })
-    const loading = ref(true)
-    const tableData = ref([])
-    const chooseData = ref([])
-    const handleSelectionChange = (val) => {
-      chooseData.value = val
+  setup () {
+    // const store = useStore()
+    const xGrid = ref(null)
+    const serveApiUrl = 'https://api.vxetable.cn/demo'
+
+    const searchEvent = () => {
+      const $grid = xGrid.value
+      $grid.commitProxy('query')
     }
-    // 获取表格数据
-    // params <init> Boolean ，默认为false，用于判断是否需要初始化分页
-    const getTableData = (init) => {
-      loading.value = true
-      if (init) {
-        page.index = 1
-      }
-      let params = {
-        page: page.index,
-        pageSize: page.size,
-        ...query
-      }
-      getData(params)
-      .then(res => {
-        let data = res.data.list
-        if (Array.isArray(data)) {
-          data.forEach(d => {
-            const select = selectData.find(select => select.value === d.choose)
-            select ? d.chooseName = select.label : d.chooseName = d.choose
-            const radio = radioData.find(select => select.value === d.radio)
-            radio ? d.radioName = radio.label : d.radio
-          })
+
+    function resetEvent(){
+
+    }
+  
+    const formData = reactive({
+      name: ''
+    })
+
+    const gridOptions = reactive({
+      showOverflow: true,
+      border: 'inner',
+      height: 548,
+      rowConfig: {
+        keyField: 'id'
+      },
+      columnConfig: {
+        resizable: true
+      },
+      printConfig: {
+        columns: [
+          { field: 'name' },
+          { field: 'email' },
+          { field: 'nickname' },
+          { field: 'age' },
+          { field: 'amount' }
+        ]
+      },
+      sortConfig: {
+        trigger: 'cell',
+        remote: true,
+        defaultSort: {
+          field: 'name',
+          order: 'desc'
         }
-        tableData.value = res.data.list
-        page.total = Number(res.data.pager.total)
-      })
-      .catch(error => {
-        tableData.value = []
-        page.index = 1
-        page.total = 0
-      })
-      .finally(() => {
-        loading.value = false
-      })
-    }
-    // 删除功能
-    const handleDel = (data) => {
-      let params = {
-        ids: data.map((e)=> {
-          return e.id
-        }).join(',')
-      }
-      del(params)
-      .then(res => {
-        ElMessage({
-          type: 'success',
-          message: '删除成功'
-        })
-        getTableData(tableData.value.length === 1 ? true : false)
-      })
-    }
-    // 新增弹窗功能
-    const handleAdd = () => {
-      layer.title = '新增数据'
-      layer.show = true
-      delete layer.row
-    }
-    // 编辑弹窗功能
-    const handleEdit = (row) => {
-      layer.title = '编辑数据'
-      layer.row = row
-      layer.show = true
-    }
-    getTableData(true)
+      },
+      filterConfig: {
+        remote: true
+      },
+      pagerConfig: {
+        pageSize: 15,
+        pageSizes: [5, 15, 20, 50, 100, 200, 500, 1000]
+      },
+      exportConfig: {
+        // 默认选中类型
+        type: 'xlsx',
+        // 局部自定义类型
+        types: ['xlsx', 'csv', 'html', 'xml', 'txt'],
+        // 自定义数据量列表
+        modes: ['current', 'all']
+      },
+      radioConfig: {
+        labelField: 'id',
+        reserve: true,
+        highlight: true
+      },
+      proxyConfig: {
+        seq: true, // 启用动态序号代理，每一页的序号会根据当前页数变化
+        sort: true, // 启用排序代理，当点击排序时会自动触发 query 行为
+        filter: true, // 启用筛选代理，当点击筛选时会自动触发 query 行为
+        // 对应响应结果 { result: [], page: { total: 100 } }
+        props: {
+          result: 'result', // 配置响应结果列表字段
+          total: 'page.total' // 配置响应结果总页数字段
+        },
+        ajax: {
+          // 接收 Promise 对象
+          query: ({ page, sorts, filters }) => {
+            const queryParams = Object.assign({}, formData)
+            // 处理排序条件
+            const firstSort = sorts[0]
+            if (firstSort) {
+              queryParams.sort = firstSort.field
+              queryParams.order = firstSort.order
+            }
+            // 处理筛选条件
+            filters.forEach(({ field, values }) => {
+              queryParams[field] = values.join(',')
+            })
+            return fetch(`${serveApiUrl}/api/pub/page/list/${page.pageSize}/${page.currentPage}?${XEUtils.serialize(queryParams)}`).then(response => response.json())
+          },
+          // 被某些特殊功能所触发，例如：导出数据 mode=all 时，会触发该方法并对返回的数据进行导出
+          queryAll: () => fetch(`${serveApiUrl}/api/pub/all`).then(response => response.json())
+        }
+      },
+      toolbarConfig: {
+        export: true,
+        print: true,
+        custom: true,
+        slots: {
+          buttons: 'toolbar_buttons'
+        }
+      },
+      columns: [
+        { type: 'seq', width: 60, fixed: 'left' },
+        { type: 'radio', title: 'ID', width: 120, fixed: 'left' },
+        { field: 'name', title: 'Name', minWidth: 160, sortable: true },
+        { field: 'email', title: 'Email', minWidth: 160 },
+        { field: 'nickname', title: 'Nickname', sortable: true, minWidth: 160 },
+        { field: 'age', title: 'Age', visible: false, sortable: true, width: 100 },
+        {
+          field: 'role',
+          title: 'Role',
+          sortable: true,
+          minWidth: 160,
+          filters: [
+            { label: '前端开发', value: '前端', checked: true },
+            { label: '后端开发', value: '后端' },
+            { label: '测试', value: '测试' },
+            { label: '程序员鼓励师', value: '程序员鼓励师' }
+          ],
+          filterMultiple: false
+        },
+        {
+          field: 'amount',
+          title: 'Amount',
+          width: 140,
+          formatter ({ cellValue }) {
+            return cellValue ? `￥${XEUtils.commafy(Number(cellValue), { digits: 2 })}` : ''
+          }
+        },
+        {
+          field: 'updateDate',
+          title: 'Update Date',
+          visible: false,
+          width: 160,
+          sortable: true,
+          formatter ({ cellValue }) {
+            return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:ss:mm')
+          }
+        },
+        {
+          field: 'createDate',
+          title: 'Create Date',
+          visible: false,
+          width: 160,
+          sortable: true,
+          formatter ({ cellValue }) {
+            return XEUtils.toDateString(cellValue, 'yyyy-MM-dd')
+          }
+        }
+      ]
+    })
     return {
-      query,
-      tableData,
-      chooseData,
-      loading,
-      page,
-      layer,
-      handleSelectionChange,
-      handleAdd,
-      handleEdit,
-      handleDel,
-      getTableData
+      xGrid,
+      formData,
+      resetEvent,
+      gridOptions,
+      searchEvent
     }
   }
 })
 </script>
 
 <style lang="scss" scoped>
-  
+
 </style>

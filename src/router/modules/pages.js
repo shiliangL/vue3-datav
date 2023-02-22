@@ -16,7 +16,7 @@ const route = [
       {
         path: 'categoryTable',
         component: createNameComponent(() => import('@/views/main/pages/categoryTable/index.vue')),
-        meta: { title: '分类联动表格', cache: true, roles: ['admin'] }
+        meta: { title: '联动表格', cache: true, roles: ['admin'] }
       },
       {
         path: 'treeTable',

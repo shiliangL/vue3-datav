@@ -3,16 +3,16 @@ import { viteMockServe } from 'vite-plugin-mock'
 import { resolve } from 'path'
 
 const pathResolve = (dir) => {
-  return resolve(__dirname, ".", dir)
+  return resolve(__dirname, '.', dir)
 }
 
 const alias = {
-  '@': pathResolve("src")
+  '@': pathResolve('src')
 }
 
 // https://vitejs.dev/config/
 export default ({ command }) => {
-  const prodMock = true;
+  const prodMock = true
   return {
     base: './',
     resolve: {
@@ -23,14 +23,15 @@ export default ({ command }) => {
       host: '0.0.0.0',
       open: true,
       proxy: { // 代理配置
-        '/dev': 'https://www.fastmock.site/mock/48cab8545e64d93ff9ba66a87ad04f6b/'
-      },
+        '/dev': 'https://www.fastmock.site/mock/48cab8545e64d93ff9ba66a87ad04f6b/',
+        '/demo': 'https://api.vxetable.cn/demo/'
+      }
     },
     build: {
       rollupOptions: {
         output: {
           manualChunks: {
-            
+
           }
         }
       }
@@ -46,8 +47,8 @@ export default ({ command }) => {
           import { setupProdMockServer } from '../mockProdServer';
           setupProdMockServer();
         `,
-        logger: true,
-      }),
+        logger: true
+      })
     ]
-  };
+  }
 }
