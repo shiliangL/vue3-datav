@@ -1,15 +1,8 @@
 <template>
   <el-container style="height: 100vh">
-    <div
-      class="mask"
-      v-show="!isCollapse && !contentFullScreen"
-      @click="hideMenu"
-    ></div>
-    <el-aside
-      :width="isCollapse ? '60px' : '250px'"
-      :class="isCollapse ? 'hide-aside' : 'show-side'"
-      v-show="!contentFullScreen"
-    >
+    <div class="mask" @click="hideMenu" v-show="!isCollapse && !contentFullScreen"></div>
+    <el-aside :width="isCollapse ? '60px' : '250px'" v-show="!contentFullScreen"
+      :class="isCollapse ? 'hide-aside' : 'show-side'">
       <Logo v-if="showLogo" />
       <Menu />
     </el-aside>
@@ -18,21 +11,17 @@
         <Header />
       </el-header>
       <Tabs v-show="showTabs" />
-      <el-main>
-        <router-view v-slot="{ Component, route }">
-          <transition
-            :name="route.meta.transition || 'fade-transform'"
-            mode="out-in"
-          >
-            <keep-alive
-              v-if="keepAliveComponentsName"
-              :include="keepAliveComponentsName"
-            >
-              <component :is="Component" :key="route.fullPath" />
-            </keep-alive>
-            <component v-else :is="Component" :key="route.fullPath" />
-          </transition>
-        </router-view>
+      <el-main class="container_main">
+        <div class="container_main_inner">
+          <router-view v-slot="{ Component, route }">
+            <transition :name="route.meta.transition || 'fade-transform'" mode="out-in">
+              <keep-alive v-if="keepAliveComponentsName" :include="keepAliveComponentsName">
+                <component :is="Component" :key="route.fullPath" />
+              </keep-alive>
+              <component v-else :is="Component" :key="route.fullPath" />
+            </transition>
+          </router-view>
+        </div>
       </el-main>
     </el-container>
   </el-container>
@@ -99,27 +88,43 @@ export default defineComponent({
   padding-left: 0;
   padding-right: 0;
 }
+
 .el-aside {
   display: flex;
   flex-direction: column;
   transition: 0.2s;
   overflow-x: hidden;
   transition: 0.3s;
+
   &::-webkit-scrollbar {
     width: 0 !important;
   }
 }
+
 .el-main {
-  background-color: var(--system-container-background);
-  height: 100%;
   padding: 0;
+  height: 100%;
+  background-color: var(--system-container-background);
+
+  .container_main_inner {
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
+    margin: 15px;
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    box-shadow: var(--el-box-shadow);
+    background-color: var(--system-container-main-background);
+  }
 }
+
 .el-main-box {
   width: 100%;
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
 }
+
 @media screen and (max-width: 1000px) {
   .el-aside {
     position: fixed;
@@ -127,10 +132,12 @@ export default defineComponent({
     left: 0;
     height: 100vh;
     z-index: 1000;
+
     &.hide-aside {
       left: -250px;
     }
   }
+
   .mask {
     position: fixed;
     top: 0;
